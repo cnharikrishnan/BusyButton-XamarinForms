@@ -13,9 +13,9 @@
     </ContentPage.BindingContext>
 
     <StackLayout Spacing="20" Padding="20" VerticalOptions="Center">
-        <Entry Placeholder="Username" Text="{Binding Username}"/>
-        <Entry Placeholder="Password" Text="{Binding Password}" IsPassword="true"/>
-        <control:BusyButton Text="Login" IsBusy="{Binding IsBusy}" Command="{Binding LoginCommand}"/>
-        <Label Text="Login Success" IsVisible="{Binding IsValidLogin}" TextColor="Red" HorizontalTextAlignment="Center" HorizontalOptions="CenterAndExpand"/>
+        <Entry Placeholder="Username" Text="{Binding Username}" />
+        <Entry Placeholder="Password" Text="{Binding Password}" IsPassword="true" />
+        <control:BusyButton Text="Login" IsBusy="{Binding IsBusy}" Command="{Binding LoginCommand}" HeightRequest="50" WidthRequest="100" />
+        <Label Text="Login Success" IsVisible="{Binding IsValidLogin}" TextColor="Red" HorizontalTextAlignment="Center" HorizontalOptions="CenterAndExpand" />
     </StackLayout>
 </ContentPage>

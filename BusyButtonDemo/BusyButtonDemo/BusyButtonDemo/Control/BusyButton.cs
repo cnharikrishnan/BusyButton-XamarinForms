@@ -6,28 +6,48 @@ using Xamarin.Forms;
 
 namespace BusyButtonDemo.Control
 {
-    public class BusyButton : RelativeLayout
+    public class BusyButton : RelativeLayout, IDisposable
     {
+        #region Constructor
+
         public BusyButton()
         {
-            this.HeightRequest = 50;
-            this.WidthRequest = 100;
-            Children.Add(new Button(), Constraint.Constant(0), Constraint.Constant(0), Constraint.RelativeToParent((p) => { return p.Width; }), Constraint.RelativeToParent((p) => { return p.Height; }));
-
-            Children.Add(new ActivityIndicator
+            this.Button = new Button();
+            this.Loader = new ActivityIndicator
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 HeightRequest = 30,
                 WidthRequest = 30
-            }, Constraint.RelativeToParent((p) => { return p.Width / 2 - 15; }), Constraint.RelativeToParent((p) => { return p.Height / 2 - 15; }));
+            };
+
+            Children.Add(this.Button, Constraint.Constant(0), Constraint.Constant(0),
+                Constraint.RelativeToParent((p) =>
+                {
+                    return p.Width;
+                }), 
+                Constraint.RelativeToParent((p) =>
+                {
+                    return p.Height;
+                }));
+
+            Children.Add(this.Loader, Constraint.RelativeToParent((p) =>
+            {
+                return p.Width / 2 - 15;
+            }),
+            Constraint.RelativeToParent((p) =>
+            {
+                return p.Height / 2 - 15;
+            }));
         }
 
-        public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(BusyButton), string.Empty, propertyChanged: OnTextChanged);
+        #endregion
 
-        public static readonly BindableProperty IsBusyProperty = BindableProperty.Create(nameof(IsBusy), typeof(bool), typeof(BusyButton), false, propertyChanged: OnIsBusyChanged);
+        #region Properties
 
-        public static readonly BindableProperty CommandProperty = BindableProperty.Create(nameof(IsBusy), typeof(ICommand), typeof(BusyButton), null, propertyChanged: OnCommandChanged);
+        public Button Button { get; set; }
+
+        public ActivityIndicator Loader { get; set; }
 
         public string Text
         {
@@ -35,11 +55,17 @@ namespace BusyButtonDemo.Control
             set { SetValue(TextProperty, value); }
         }
 
+        public static readonly BindableProperty TextProperty = 
+            BindableProperty.Create(nameof(Text), typeof(string), typeof(BusyButton), string.Empty, propertyChanged: OnTextChanged);
+
         public bool IsBusy
         {
             get { return (bool)GetValue(IsBusyProperty); }
             set { SetValue(IsBusyProperty, value); }
         }
+
+        public static readonly BindableProperty IsBusyProperty = 
+            BindableProperty.Create(nameof(IsBusy), typeof(bool), typeof(BusyButton), false, propertyChanged: OnIsBusyChanged);
 
         public ICommand Command
         {
@@ -47,63 +73,62 @@ namespace BusyButtonDemo.Control
             set { SetValue(CommandProperty, value); }
         }
 
+        public static readonly BindableProperty CommandProperty = 
+            BindableProperty.Create(nameof(IsBusy), typeof(ICommand), typeof(BusyButton), null, propertyChanged: OnCommandChanged);
+
+        #endregion
+
+        #region Callback
+
+        private void SetTextBasedOnBusy(bool isBusy, string text)
+        {
+            var activityIndicator = this.Loader;
+            var button = this.Button;
+            if (activityIndicator == null || button == null)
+                return;
+
+            activityIndicator.IsVisible = activityIndicator.IsRunning = isBusy;
+            button.Text = isBusy ? string.Empty : text;
+        }
+
         private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = bindable as BusyButton;
-
             if (control == null)
-            {
                 return;
-            }
 
-            SetTextBasedOnBusy(control, control.IsBusy, newValue as string);
+            control.SetTextBasedOnBusy(control.IsBusy, newValue.ToString());
         }
 
         private static void OnIsBusyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = bindable as BusyButton;
-
             if (control == null)
-            {
                 return;
-            }
 
-            SetTextBasedOnBusy(control, (bool)newValue, control.Text);
-        }
-
-        private static void SetTextBasedOnBusy(BusyButton control, bool isBusy, string text)
-        {
-            var activityIndicator = GetActivityIndicator(control);
-            var button = GetButton(control);
-
-            if (activityIndicator == null || button == null)
-            {
-                return;
-            }
-
-            activityIndicator.IsVisible = activityIndicator.IsRunning = isBusy;
-            button.Text = isBusy ? string.Empty : control.Text;
+            control.SetTextBasedOnBusy((bool)newValue, control.Text);
         }
 
         private static void OnCommandChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var control = bindable as BusyButton;
-            var button = GetButton(control);
+            var button = control.Button;
             if (control == null || button == null)
-            {
                 return;
-            }
+
             button.Command = control.Command;
         }
 
-        private static ActivityIndicator GetActivityIndicator(BusyButton control)
+        #endregion
+
+        #region Disposable
+
+        public void Dispose()
         {
-            return control.Children[1] as ActivityIndicator;
+            this.Button = null;
+            this.Loader = null;
         }
 
-        private static Button GetButton(BusyButton control)
-        {
-            return control.Children[0] as Button;
-        }
+        #endregion
     }
 }
