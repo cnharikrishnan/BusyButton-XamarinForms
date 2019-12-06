@@ -5,6 +5,7 @@ This repository demonstrates how to create a custom control in Xamarin.Forms. He
 
 The below XAML demonstrates the code required to configure the custom busy button from the XAML. 
 
+```xaml
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -26,7 +27,7 @@ The below XAML demonstrates the code required to configure the custom busy butto
         <Label Text="Login Success" IsVisible="{Binding IsValidLogin}" TextColor="Red" HorizontalTextAlignment="Center" HorizontalOptions="CenterAndExpand"/>
     </StackLayout>
 </ContentPage>
-
+```
 
 The output of the busy button working is shown below. 
 
